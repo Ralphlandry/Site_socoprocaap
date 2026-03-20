@@ -240,7 +240,7 @@ onMounted(async () => {
 async function fetchUsers() {
   loading.value = true
   try {
-    const res = await api.get('/api/admin/users/')
+    const res = await api.get('/admin/users/')
     users.value = res.data
   } finally {
     loading.value = false
@@ -264,7 +264,7 @@ async function createUser() {
   if (form.value.password.length < 8) { createError.value = 'Le mot de passe doit contenir au moins 8 caractères.'; return }
   creating.value = true
   try {
-    await api.post('/api/admin/users/', form.value)
+    await api.post('/admin/users/', form.value)
     showCreate.value = false
     fetchUsers()
   } catch (e) {
@@ -286,7 +286,7 @@ async function saveEdit() {
   if (!editForm.value.username) { editError.value = 'L\'identifiant est requis.'; return }
   editing.value = true
   try {
-    await api.patch(`/api/admin/users/${editTarget.value.id}/`, editForm.value)
+    await api.patch(`/admin/users/${editTarget.value.id}/`, editForm.value)
     showEdit.value = false
     fetchUsers()
   } catch (e) {
@@ -311,7 +311,7 @@ async function changePassword() {
   if (pwdForm.value.password !== pwdForm.value.confirm) { pwdError.value = 'Les mots de passe ne correspondent pas.'; return }
   changingPwd.value = true
   try {
-    await api.post(`/api/admin/users/${passwordTarget.value.id}/change-password/`, { password: pwdForm.value.password })
+    await api.post(`/admin/users/${passwordTarget.value.id}/change-password/`, { password: pwdForm.value.password })
     pwdSuccess.value = 'Mot de passe modifié avec succès.'
     pwdForm.value = { password: '', confirm: '' }
   } catch (e) {
@@ -326,7 +326,7 @@ async function deleteUser(u) {
   if (u.id === myId.value) return
   if (!confirm(`Supprimer l'utilisateur « ${u.username} » ? Cette action est irréversible.`)) return
   try {
-    await api.delete(`/api/admin/users/${u.id}/`)
+    await api.delete(`/admin/users/${u.id}/`)
     fetchUsers()
   } catch (e) {
     alert(e.response?.data?.error || 'Erreur lors de la suppression.')
