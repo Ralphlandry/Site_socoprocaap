@@ -3,14 +3,15 @@
     <div class="container">
       <div class="footer-grid">
         <div class="footer-col">
-          <h3><img src="/logo.jpeg" alt="SOCOPROCAAP" class="footer-logo" /> SOCOPROCAAP</h3>
+          <h3><img src="/LOGO (1).png" alt="SOCOPROCAAP" class="footer-logo" /> SOCOPROCAAP</h3>
           <p>Coopérative agropastorale spécialisée dans le cacao, le maïs, le gombo et l'élevage porcin. Nous cultivons l'excellence depuis des générations.</p>
         </div>
         <div class="footer-col">
           <h4>Navigation</h4>
           <ul>
             <li><router-link to="/">Accueil</router-link></li>
-            <li><router-link to="/services">Services</router-link></li>
+            <li><router-link to="/equipe">Équipe</router-link></li>
+            <li><router-link to="/productions">Productions</router-link></li>
             <li><router-link to="/blog">Blog</router-link></li>
             <li><router-link to="/galerie">Galerie</router-link></li>
             <li><router-link to="/contact">Contact</router-link></li>

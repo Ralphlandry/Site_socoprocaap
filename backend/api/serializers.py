@@ -1,10 +1,22 @@
 from rest_framework import serializers
-from .models import Service, BlogPost, GalerieCategorie, GalerieImage, Contact, InfoSite, Statistique
+from .models import Service, BlogPost, GalerieCategorie, GalerieImage, Contact, InfoSite, Statistique, MembreEquipe, Campagne
+
+
+class CampagneSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Campagne
+        fields = '__all__'
 
 
 class ServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Service
+        fields = '__all__'
+
+
+class MembreEquipeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MembreEquipe
         fields = '__all__'
 
 

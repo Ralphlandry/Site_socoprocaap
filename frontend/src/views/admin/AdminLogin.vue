@@ -8,7 +8,7 @@
 
     <div class="login-card">
       <div class="login-brand">
-        <img src="/logo.jpeg" alt="SOCOPROCAAP" class="brand-logo" />
+        <img src="/LOGO (1).png" alt="SOCOPROCAAP" class="brand-logo" />
         <h1>SOCOPROCAAP</h1>
         <p>Espace d'administration</p>
       </div>

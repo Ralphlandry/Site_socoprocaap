@@ -110,6 +110,8 @@ CSRF_TRUSTED_ORIGINS = os.environ.get(
 CSRF_COOKIE_HTTPONLY = False
 CSRF_COOKIE_SAMESITE = 'Lax'
 SESSION_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_AGE = 28800          # Session expire après 8 heures d'inactivité
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Session expire à la fermeture du navigateur
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',

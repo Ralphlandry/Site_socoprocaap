@@ -6,12 +6,13 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.middleware.csrf import get_token
-from .models import Service, BlogPost, GalerieCategorie, GalerieImage, Contact, InfoSite, Statistique
+from .models import Service, BlogPost, GalerieCategorie, GalerieImage, Contact, InfoSite, Statistique, MembreEquipe, Campagne
 from .serializers import (
     ServiceSerializer, BlogPostListSerializer, BlogPostDetailSerializer,
     GalerieCategorieSerializer, GalerieImageSerializer,
     ContactSerializer, ContactAdminSerializer, InfoSiteSerializer,
     BlogPostAdminSerializer, GalerieImageAdminSerializer, StatistiqueSerializer,
+    MembreEquipeSerializer, CampagneSerializer,
 )
 
 
@@ -72,6 +73,13 @@ class InfoSiteView(generics.GenericAPIView):
             serializer = self.get_serializer(info)
             return Response(serializer.data)
         return Response({}, status=status.HTTP_200_OK)
+
+
+class EquipeListView(generics.ListAPIView):
+    queryset = MembreEquipe.objects.filter(actif=True)
+    serializer_class = MembreEquipeSerializer
+    permission_classes = [AllowAny]
+    pagination_class = None
 
 
 # --- Auth views ---
@@ -216,6 +224,62 @@ class StatistiqueListView(generics.ListAPIView):
     serializer_class = StatistiqueSerializer
     permission_classes = [AllowAny]
     pagination_class = None
+
+
+# Équipe admin
+class AdminEquipeListCreateView(generics.ListCreateAPIView):
+    queryset = MembreEquipe.objects.all()
+    serializer_class = MembreEquipeSerializer
+    permission_classes = [IsAdminUser]
+    parser_classes = [MultiPartParser, FormParser]
+    pagination_class = None
+
+
+class AdminEquipeDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = MembreEquipe.objects.all()
+    serializer_class = MembreEquipeSerializer
+    permission_classes = [IsAdminUser]
+    parser_classes = [MultiPartParser, FormParser]
+
+
+# Campagnes public
+class CampagneListView(generics.ListAPIView):
+    serializer_class = CampagneSerializer
+    permission_classes = [AllowAny]
+    pagination_class = None
+
+    def get_queryset(self):
+        qs = Campagne.objects.all()
+        produit = self.request.query_params.get('produit')
+        session = self.request.query_params.get('session')
+        if produit:
+            qs = qs.filter(produit=produit)
+        if session:
+            qs = qs.filter(session=session)
+        return qs
+
+
+# Campagnes admin
+class AdminCampagneListCreateView(generics.ListCreateAPIView):
+    serializer_class = CampagneSerializer
+    permission_classes = [IsAdminUser]
+    pagination_class = None
+
+    def get_queryset(self):
+        qs = Campagne.objects.all()
+        produit = self.request.query_params.get('produit')
+        session = self.request.query_params.get('session')
+        if produit:
+            qs = qs.filter(produit=produit)
+        if session:
+            qs = qs.filter(session=session)
+        return qs
+
+
+class AdminCampagneDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Campagne.objects.all()
+    serializer_class = CampagneSerializer
+    permission_classes = [IsAdminUser]
 
 
 # Statistiques admin

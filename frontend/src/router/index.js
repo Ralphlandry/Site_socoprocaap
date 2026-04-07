@@ -8,9 +8,18 @@ const routes = [
     component: () => import('../views/AccueilView.vue'),
   },
   {
-    path: '/services',
+    path: '/productions',
     name: 'Services',
     component: () => import('../views/ServicesView.vue'),
+  },
+  {
+    path: '/services',
+    redirect: '/productions',
+  },
+  {
+    path: '/equipe',
+    name: 'Equipe',
+    component: () => import('../views/EquipeView.vue'),
   },
   {
     path: '/blog',
@@ -52,6 +61,8 @@ const routes = [
       { path: 'blog', name: 'AdminBlog', component: () => import('../views/admin/AdminBlog.vue') },
       { path: 'galerie', name: 'AdminGalerie', component: () => import('../views/admin/AdminGalerie.vue') },
       { path: 'services', name: 'AdminServices', component: () => import('../views/admin/AdminServices.vue') },
+      { path: 'equipe', name: 'AdminEquipe', component: () => import('../views/admin/AdminEquipe.vue') },
+      { path: 'campagne', name: 'AdminCampagne', component: () => import('../views/admin/AdminCampagne.vue') },
       { path: 'contacts', name: 'AdminContacts', component: () => import('../views/admin/AdminContacts.vue') },
       { path: 'statistiques', name: 'AdminStatistiques', component: () => import('../views/admin/AdminStatistiques.vue') },
       { path: 'users', name: 'AdminUsers', component: () => import('../views/admin/AdminUsers.vue') },
@@ -68,8 +79,20 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to) => {
+  const auth = useAuthStore()
+
+  // Si déjà authentifié et on essaie d'accéder à la page de login → rediriger vers le dashboard
+  if (to.name === 'AdminLogin') {
+    if (!auth.isAuthenticated) {
+      await auth.checkAuth()
+    }
+    if (auth.isAuthenticated) {
+      return { name: 'AdminDashboard' }
+    }
+    return
+  }
+
   if (to.matched.some(r => r.meta.requiresAuth)) {
-    const auth = useAuthStore()
     if (!auth.isAuthenticated) {
       await auth.checkAuth()
       if (!auth.isAuthenticated) {

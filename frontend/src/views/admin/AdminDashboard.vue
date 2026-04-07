@@ -31,7 +31,7 @@
             <i class="fas fa-image"></i><span>Ajouter image</span>
           </router-link>
           <router-link to="/admin/services" class="action-item">
-            <i class="fas fa-seedling"></i><span>Gérer services</span>
+            <i class="fas fa-seedling"></i><span>Gérer productions</span>
           </router-link>
           <router-link to="/admin/statistiques" class="action-item">
             <i class="fas fa-chart-line"></i><span>Statistiques</span>
@@ -81,7 +81,7 @@ onMounted(async () => {
   try {
     const { data } = await api.get('/admin/stats/')
     stats.value = [
-      { label: 'Services', value: data.services, icon: 'fas fa-seedling', color: '#2d7d46' },
+      { label: 'Productions', value: data.services, icon: 'fas fa-seedling', color: '#2d7d46' },
       { label: 'Articles', value: data.blog_posts, icon: 'fas fa-newspaper', color: '#0284c7', sub: `${data.blog_published} publiés` },
       { label: 'Images', value: data.galerie_images, icon: 'fas fa-images', color: '#d97706' },
       { label: 'Messages', value: data.contacts, icon: 'fas fa-envelope', color: '#dc2626', sub: `${data.contacts_non_lus} non lus` },

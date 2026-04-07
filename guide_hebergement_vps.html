@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; color: #1a1a1a; margin: 2.5cm; line-height: 1.5; }
+  h1 { font-size: 22pt; color: #0f172a; border-bottom: 3px solid #059669; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 15pt; color: #059669; margin-top: 28px; margin-bottom: 6px; border-left: 4px solid #059669; padding-left: 10px; }
+  h3 { font-size: 12pt; color: #0f172a; margin-top: 18px; margin-bottom: 4px; }
+  p { margin: 6px 0 10px 0; }
+  pre, code { font-family: Consolas, "Courier New", monospace; font-size: 10pt; background: #f1f5f9; color: #0f172a; padding: 10px 14px; border-left: 3px solid #059669; display: block; white-space: pre-wrap; margin: 8px 0; border-radius: 4px; }
+  .note { background: #f0fdf4; border: 1px solid #a7f3d0; padding: 10px 14px; border-radius: 6px; margin: 10px 0; font-size: 10.5pt; }
+  .warn { background: #fff7ed; border: 1px solid #fed7aa; padding: 10px 14px; border-radius: 6px; margin: 10px 0; font-size: 10.5pt; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 10.5pt; }
+  th { background: #0f172a; color: #fff; padding: 8px 12px; text-align: left; }
+  td { border: 1px solid #e2e8f0; padding: 7px 12px; }
+  tr:nth-child(even) td { background: #f8fafc; }
+  ul, ol { margin: 6px 0 10px 20px; }
+  li { margin-bottom: 4px; }
+  .step-num { display: inline-block; background: #059669; color: #fff; border-radius: 50%; width: 22px; height: 22px; text-align: center; font-weight: bold; font-size: 10pt; line-height: 22px; margin-right: 8px; }
+  .page-break { page-break-before: always; }
+  .subtitle { color: #64748b; font-size: 12pt; margin-top: -6px; margin-bottom: 20px; }
+  .cover { text-align: center; padding: 60px 0 40px 0; }
+  .cover h1 { border: none; font-size: 28pt; }
+  .cover .subtitle { font-size: 13pt; }
+  .cover .date { color: #94a3b8; font-size: 10pt; margin-top: 40px; }
+</style>
+</head>
+<body>
+
+<!-- PAGE DE COUVERTURE -->
+<div class="cover">
+  <h1>Guide de déploiement VPS</h1>
+  <div class="subtitle">Site vitrine SOCOPROCAAP<br>Django + Vue.js + PostgreSQL + Docker</div>
+  <div class="date">Avril 2026</div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- SOMMAIRE -->
+<h2>Sommaire</h2>
+<ol>
+  <li>Prérequis</li>
+  <li>Connexion au VPS et configuration initiale</li>
+  <li>Installation de Docker et Docker Compose</li>
+  <li>Cloner le projet sur le serveur</li>
+  <li>Configurer les variables d'environnement</li>
+  <li>Lancer l'application avec Docker</li>
+  <li>Configurer un nom de domaine</li>
+  <li>Installer un certificat SSL (HTTPS) avec Let's Encrypt</li>
+  <li>Configurer le démarrage automatique</li>
+  <li>Commandes de maintenance</li>
+</ol>
+
+<div class="page-break"></div>
+
+<!-- ÉTAPE 1 -->
+<h2><span class="step-num">1</span> Prérequis</h2>
+
+<h3>Ce dont vous avez besoin avant de commencer :</h3>
+<ul>
+  <li>Un VPS avec <strong>Ubuntu 22.04 LTS</strong> ou <strong>Debian 12</strong> (recommandé)</li>
+  <li>Au minimum : <strong>1 vCPU, 2 Go RAM, 20 Go de stockage</strong></li>
+  <li>Un accès SSH root ou un utilisateur avec les droits sudo</li>
+  <li>Le code source du projet sur GitHub :
+    <code>https://github.com/Ralphlandry/Site_socoprocaap.git</code>
+  </li>
+  <li>(Optionnel) Un nom de domaine pointant vers l'IP du VPS</li>
+</ul>
+
+<div class="note">
+  <strong>Fournisseurs VPS recommendés :</strong> OVH, Hostinger, DigitalOcean, Hetzner, Contabo.
+  Comptez entre 4 € et 10 €/mois pour une configuration suffisante.
+</div>
+
+<div class="page-break"></div>
+
+<!-- ÉTAPE 2 -->
+<h2><span class="step-num">2</span> Connexion au VPS et configuration initiale</h2>
+
+<h3>2.1 — Se connecter en SSH</h3>
+<p>Depuis votre ordinateur (Windows : utilisez PowerShell ou PuTTY) :</p>
+<pre>ssh root@ADRESSE_IP_DU_VPS</pre>
+
+<p>Si vous avez une clé SSH configurée :</p>
+<pre>ssh -i chemin\vers\votre_cle.pem root@ADRESSE_IP_DU_VPS</pre>
+
+<h3>2.2 — Mettre à jour le système</h3>
+<pre>apt update && apt upgrade -y</pre>
+
+<h3>2.3 — Créer un utilisateur non-root (bonne pratique)</h3>
+<pre>adduser socopro
+usermod -aG sudo socopro
+su - socopro</pre>
+
+<h3>2.4 — Configurer le pare-feu</h3>
+<pre>sudo ufw allow OpenSSH
+sudo ufw allow 80
+sudo ufw allow 443
+sudo ufw enable
+sudo ufw status</pre>
+
+<div class="note">
+  Ces règles autorisent SSH (port 22), HTTP (port 80) et HTTPS (port 443).
+</div>
+
+<div class="page-break"></div>
+
+<!-- ÉTAPE 3 -->
+<h2><span class="step-num">3</span> Installation de Docker et Docker Compose</h2>
+
+<h3>3.1 — Installer Docker</h3>
+<pre>sudo apt install -y ca-certificates curl gnupg lsb-release
+
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
+  sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+  https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin</pre>
+
+<h3>3.2 — Permettre à votre utilisateur d'utiliser Docker sans sudo</h3>
+<pre>sudo usermod -aG docker $USER
+newgrp docker</pre>
+
+<h3>3.3 — Vérifier l'installation</h3>
+<pre>docker --version
+docker compose version</pre>
+
+<div class="note">
+  <strong>Résultat attendu :</strong><br>
+  Docker version 26.x.x<br>
+  Docker Compose version v2.x.x
+</div>
+
+<div class="page-break"></div>
+
+<!-- ÉTAPE 4 -->
+<h2><span class="step-num">4</span> Cloner le projet sur le serveur</h2>
+
+<h3>4.1 — Installer Git (si absent)</h3>
+<pre>sudo apt install -y git</pre>
+
+<h3>4.2 — Cloner le dépôt</h3>
+<pre>cd /opt
+sudo git clone https://github.com/Ralphlandry/Site_socoprocaap.git socopro
+sudo chown -R $USER:$USER /opt/socopro
+cd /opt/socopro</pre>
+
+<div class="note">
+  Le projet est maintenant dans <strong>/opt/socopro</strong>. Vous pouvez choisir un autre chemin si vous préférez (ex: /home/socopro/site).
+</div>
+
+<div class="page-break"></div>
+
+<!-- ÉTAPE 5 -->
+<h2><span class="step-num">5</span> Configurer les variables d'environnement</h2>
+
+<h3>5.1 — Créer le fichier .env</h3>
+<p>À la racine du projet, créez un fichier <code>.env</code> :</p>
+<pre>nano /opt/socopro/.env</pre>
+
+<p>Collez le contenu suivant en remplaçant les valeurs :</p>
+<pre>POSTGRES_DB=socopro_db
+POSTGRES_USER=socopro_user
+POSTGRES_PASSWORD=MOT_DE_PASSE_FORT_ICI
+
+DJANGO_SECRET_KEY=UNE_CLE_SECRETE_TRES_LONGUE_ET_ALEATOIRE
+DJANGO_DEBUG=False
+DJANGO_ALLOWED_HOSTS=VOTRE_DOMAINE.COM,ADRESSE_IP_DU_VPS
+
+VITE_API_URL=https://VOTRE_DOMAINE.COM/api</pre>
+
+<div class="warn">
+  <strong>Important :</strong> Ne jamais utiliser des mots de passe simples en production.
+  Générez une clé secrète Django avec la commande :<br>
+  <code>python3 -c "import secrets; print(secrets.token_urlsafe(50))"</code>
+</div>
+
+<h3>5.2 — Vérifier que docker-compose.yml utilise les variables .env</h3>
+<p>Ouvrez docker-compose.yml et assurez-vous que les variables sont bien référencées :</p>
+<pre>cat /opt/socopro/docker-compose.yml</pre>
+
+<div class="page-break"></div>
+
+<!-- ÉTAPE 6 -->
+<h2><span class="step-num">6</span> Lancer l'application avec Docker</h2>
+
+<h3>6.1 — Construire et démarrer tous les services</h3>
+<pre>cd /opt/socopro
+docker compose up --build -d</pre>
+
+<p>Cette commande construit les images et démarre :</p>
+<ul>
+  <li>Le conteneur <strong>PostgreSQL</strong> (base de données)</li>
+  <li>Le conteneur <strong>backend</strong> (Django + Gunicorn)</li>
+  <li>Le conteneur <strong>frontend</strong> (Vue.js compilé + Nginx)</li>
+</ul>
+
+<h3>6.2 — Appliquer les migrations de base de données</h3>
+<pre>docker compose exec backend python manage.py migrate</pre>
+
+<h3>6.3 — Initialiser les données (admin + exemples)</h3>
+<pre>docker compose exec backend python manage.py shell &lt; init_data.py</pre>
+
+<h3>6.4 — Vérifier que tout fonctionne</h3>
+<pre>docker compose ps</pre>
+
+<p>Tous les services doivent afficher le statut <strong>Up</strong>. Vous pouvez également consulter les logs :</p>
+<pre>docker compose logs -f</pre>
+
+<h3>6.5 — Tester l'accès</h3>
+<p>Ouvrez un navigateur et rendez-vous sur :</p>
+<table>
+  <tr><th>Service</th><th>URL</th></tr>
+  <tr><td>Site public</td><td>http://ADRESSE_IP_DU_VPS</td></tr>
+  <tr><td>API</td><td>http://ADRESSE_IP_DU_VPS:8000/api/</td></tr>
+  <tr><td>Administration</td><td>http://ADRESSE_IP_DU_VPS/admin/</td></tr>
+</table>
+
+<div class="note">
+  <strong>Identifiants par défaut :</strong> admin / admin123<br>
+  Changez le mot de passe immédiatement après la première connexion.
+</div>
+
+<div class="page-break"></div>
+
+<!-- ÉTAPE 7 -->
+<h2><span class="step-num">7</span> Configurer un nom de domaine</h2>
+
+<h3>7.1 — Faire pointer le domaine vers votre VPS</h3>
+<p>Dans l'interface de votre registrar (OVH, Namecheap, Gandi…), créez un enregistrement DNS de type <strong>A</strong> :</p>
+<table>
+  <tr><th>Type</th><th>Nom</th><th>Valeur</th><th>TTL</th></tr>
+  <tr><td>A</td><td>@</td><td>ADRESSE_IP_DU_VPS</td><td>3600</td></tr>
+  <tr><td>A</td><td>www</td><td>ADRESSE_IP_DU_VPS</td><td>3600</td></tr>
+</table>
+
+<div class="note">
+  La propagation DNS peut prendre de quelques minutes à 24 heures. Vérifiez avec :<br>
+  <code>nslookup votre-domaine.com</code>
+</div>
+
+<h3>7.2 — Mettre à jour les variables d'environnement</h3>
+<p>Modifiez votre fichier <code>.env</code> avec le vrai domaine, puis relancez :</p>
+<pre>nano /opt/socopro/.env
+# Mettre à jour DJANGO_ALLOWED_HOSTS et VITE_API_URL
+
+docker compose up --build -d</pre>
+
+<div class="page-break"></div>
+
+<!-- ÉTAPE 8 -->
+<h2><span class="step-num">8</span> Certificat SSL / HTTPS avec Let's Encrypt</h2>
+
+<p>Pour activer HTTPS gratuitement, installez <strong>Certbot</strong> et configurez Nginx :</p>
+
+<h3>8.1 — Installer Certbot</h3>
+<pre>sudo apt install -y certbot python3-certbot-nginx</pre>
+
+<h3>8.2 — Obtenir le certificat</h3>
+<div class="warn">
+  Arrêtez d'abord le conteneur frontend pour libérer le port 80 :
+</div>
+<pre>docker compose stop frontend
+
+sudo certbot --nginx -d votre-domaine.com -d www.votre-domaine.com</pre>
+
+<p>Certbot va :</p>
+<ul>
+  <li>Vérifier la propriété du domaine</li>
+  <li>Générer les certificats SSL dans <code>/etc/letsencrypt/</code></li>
+  <li>Modifier automatiquement la configuration Nginx</li>
+</ul>
+
+<h3>8.3 — Copier les certificats dans le projet</h3>
+<pre>sudo cp /etc/letsencrypt/live/votre-domaine.com/fullchain.pem /opt/socopro/frontend/ssl/
+sudo cp /etc/letsencrypt/live/votre-domaine.com/privkey.pem /opt/socopro/frontend/ssl/</pre>
+
+<h3>8.4 — Mettre à jour nginx.conf pour HTTPS</h3>
+<p>Modifiez <code>frontend/nginx.conf</code> pour ajouter un bloc HTTPS avec les certificats, puis relancez :</p>
+<pre>docker compose up --build -d</pre>
+
+<h3>8.5 — Renouvellement automatique</h3>
+<p>Let's Encrypt expire tous les 90 jours. Ajoutez une tâche cron pour le renouvellement automatique :</p>
+<pre>sudo crontab -e
+# Ajouter la ligne suivante :
+0 3 * * * certbot renew --quiet && docker compose -f /opt/socopro/docker-compose.yml restart frontend</pre>
+
+<div class="page-break"></div>
+
+<!-- ÉTAPE 9 -->
+<h2><span class="step-num">9</span> Démarrage automatique au reboot du serveur</h2>
+
+<p>Pour que l'application redémarre automatiquement si le serveur redémarre :</p>
+
+<h3>9.1 — Créer un service systemd</h3>
+<pre>sudo nano /etc/systemd/system/socopro.service</pre>
+
+<p>Collez le contenu suivant :</p>
+<pre>[Unit]
+Description=SOCOPROCAAP Site Vitrine
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/opt/socopro
+ExecStart=/usr/bin/docker compose up -d
+ExecStop=/usr/bin/docker compose down
+TimeoutStartSec=0
+
+[Install]
+WantedBy=multi-user.target</pre>
+
+<h3>9.2 — Activer le service</h3>
+<pre>sudo systemctl daemon-reload
+sudo systemctl enable socopro.service
+sudo systemctl start socopro.service</pre>
+
+<h3>9.3 — Vérifier le statut</h3>
+<pre>sudo systemctl status socopro.service</pre>
+
+<div class="page-break"></div>
+
+<!-- ÉTAPE 10 -->
+<h2><span class="step-num">10</span> Commandes de maintenance</h2>
+
+<table>
+  <tr><th>Action</th><th>Commande</th></tr>
+  <tr><td>Voir l'état des conteneurs</td><td><code>docker compose ps</code></td></tr>
+  <tr><td>Voir les logs en temps réel</td><td><code>docker compose logs -f</code></td></tr>
+  <tr><td>Voir les logs d'un service</td><td><code>docker compose logs backend</code></td></tr>
+  <tr><td>Redémarrer un service</td><td><code>docker compose restart backend</code></td></tr>
+  <tr><td>Arrêter l'application</td><td><code>docker compose down</code></td></tr>
+  <tr><td>Mettre à jour le code</td><td>voir ci-dessous</td></tr>
+  <tr><td>Accéder au shell Django</td><td><code>docker compose exec backend python manage.py shell</code></td></tr>
+  <tr><td>Sauvegarder la BDD</td><td><code>docker compose exec db pg_dump -U socopro_user socopro_db > backup.sql</code></td></tr>
+  <tr><td>Restaurer la BDD</td><td><code>cat backup.sql | docker compose exec -T db psql -U socopro_user socopro_db</code></td></tr>
+  <tr><td>Libérer l'espace disque</td><td><code>docker system prune -f</code></td></tr>
+</table>
+
+<h3>Mettre à jour le site après modification du code</h3>
+<pre>cd /opt/socopro
+
+# Récupérer les dernières modifications depuis GitHub
+git pull origin main
+
+# Reconstruire et relancer les conteneurs
+docker compose up --build -d
+
+# Si des migrations sont nécessaires
+docker compose exec backend python manage.py migrate</pre>
+
+<div class="note">
+  <strong>Astuce :</strong> Créez un alias dans <code>~/.bashrc</code> pour simplifier les commandes :<br>
+  <code>alias socopro="cd /opt/socopro && docker compose"</code><br>
+  Puis rechargez : <code>source ~/.bashrc</code><br>
+  Vous pourrez ensuite faire : <code>socopro ps</code>, <code>socopro logs -f</code>, etc.
+</div>
+
+<div class="page-break"></div>
+
+<!-- RÉSUMÉ -->
+<h2>Résumé — Checklist de déploiement</h2>
+
+<table>
+  <tr><th>#</th><th>Étape</th><th>Fait ?</th></tr>
+  <tr><td>1</td><td>VPS Ubuntu 22.04 commandé et accessible en SSH</td><td>☐</td></tr>
+  <tr><td>2</td><td>Système mis à jour, pare-feu configuré (ports 22, 80, 443)</td><td>☐</td></tr>
+  <tr><td>3</td><td>Docker et Docker Compose installés et fonctionnels</td><td>☐</td></tr>
+  <tr><td>4</td><td>Projet cloné dans /opt/socopro</td><td>☐</td></tr>
+  <tr><td>5</td><td>Fichier .env créé avec les vraies valeurs de production</td><td>☐</td></tr>
+  <tr><td>6</td><td>docker compose up --build -d exécuté avec succès</td><td>☐</td></tr>
+  <tr><td>7</td><td>Migrations appliquées et données initialisées</td><td>☐</td></tr>
+  <tr><td>8</td><td>Site accessible sur http://IP_DU_VPS</td><td>☐</td></tr>
+  <tr><td>9</td><td>DNS configuré — domaine pointant vers le VPS</td><td>☐</td></tr>
+  <tr><td>10</td><td>Certificat SSL installé — site accessible en https://</td><td>☐</td></tr>
+  <tr><td>11</td><td>Service systemd activé — redémarrage automatique configuré</td><td>☐</td></tr>
+  <tr><td>12</td><td>Mot de passe admin changé depuis l'interface</td><td>☐</td></tr>
+</table>
+
+<br>
+<div class="note">
+  <strong>En cas de problème</strong> — commencez toujours par consulter les logs :<br>
+  <code>docker compose logs -f</code><br>
+  La majorité des erreurs (configuration BDD, clé secrète manquante, port déjà occupé) sont visibles directement dans les logs.
+</div>
+
+</body>
+</html>

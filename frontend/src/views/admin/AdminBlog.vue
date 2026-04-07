@@ -149,7 +149,7 @@ async function save() {
   if (form.value.imageFile) fd.append('image', form.value.imageFile)
   try {
     if (editing.value) {
-      await api.put(`/admin/blog/${editing.value}/`, fd, { headers: { 'Content-Type': 'multipart/form-data' } })
+      await api.patch(`/admin/blog/${editing.value}/`, fd, { headers: { 'Content-Type': 'multipart/form-data' } })
     } else {
       await api.post('/admin/blog/', fd, { headers: { 'Content-Type': 'multipart/form-data' } })
     }

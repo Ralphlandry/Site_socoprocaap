@@ -1,7 +1,7 @@
 <template>
   <div>
     <section class="page-header">
-      <h1>Nos Services</h1>
+      <h1>Nos Productions</h1>
       <p>Ce que nous offrons à nos membres et partenaires dans les filières agropastorales</p>
     </section>
 
@@ -33,7 +33,7 @@
 
         <div v-else class="empty-state">
           <i class="fas fa-seedling"></i>
-          <p>Les services seront bientôt disponibles.</p>
+          <p>Les productions seront bientôt disponibles.</p>
         </div>
       </div>
     </section>

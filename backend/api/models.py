@@ -114,8 +114,25 @@ class Statistique(models.Model):
         return f"{self.titre}: {self.valeur} {self.unite}"
 
 
+class MembreEquipe(models.Model):
+    nom = models.CharField(max_length=100)
+    prenom = models.CharField(max_length=100)
+    fonction = models.CharField(max_length=200)
+    image = models.ImageField(upload_to='equipe/', blank=True, null=True)
+    ordre = models.PositiveIntegerField(default=0)
+    actif = models.BooleanField(default=True)
+    date_creation = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['ordre', 'nom']
+        verbose_name = 'Membre de l\'équipe'
+        verbose_name_plural = 'Membres de l\'équipe'
+
+    def __str__(self):
+        return f"{self.prenom} {self.nom} — {self.fonction}"
+
+
 class InfoSite(models.Model):
-    """Informations générales du site (singleton)."""
     nom_cooperative = models.CharField(max_length=200, default='SOCOPROCAAP')
     slogan = models.CharField(max_length=300, blank=True)
     description = models.TextField(blank=True)
@@ -135,3 +152,26 @@ class InfoSite(models.Model):
 
     def __str__(self):
         return self.nom_cooperative
+
+
+class Campagne(models.Model):
+    PRODUITS = [
+        ('Cacao', 'Cacao'),
+        ('Maïs', 'Maïs'),
+        ('Gombo', 'Gombo'),
+        ('Élevage Porcin', 'Élevage Porcin'),
+    ]
+    produit = models.CharField(max_length=100, choices=PRODUITS)
+    nom_producteur = models.CharField(max_length=200)
+    tonnage = models.DecimalField(max_digits=10, decimal_places=2, help_text="en tonnes")
+    superficie = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, help_text="en hectares")
+    session = models.CharField(max_length=20, help_text="ex: 2025")
+    date_creation = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-session', 'produit', 'nom_producteur']
+        verbose_name = 'Campagne'
+        verbose_name_plural = 'Campagnes'
+
+    def __str__(self):
+        return f"{self.produit} — {self.nom_producteur} ({self.session})"

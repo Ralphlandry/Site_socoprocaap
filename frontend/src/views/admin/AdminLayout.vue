@@ -6,7 +6,7 @@
     <!-- Sidebar -->
     <aside class="al-sidebar" :class="{ 'al-sidebar--open': mobileOpen, 'al-sidebar--collapsed': collapsed }">
       <div class="al-brand">
-        <img src="/logo.jpeg" alt="SOCOPROCAAP" class="al-brand-logo" />
+        <img src="/LOGO (1).png" alt="SOCOPROCAAP" class="al-brand-logo" />
         <div v-show="!collapsed" class="al-brand-text">
           <span class="al-brand-name">SOCOPROCAAP</span>
           <span class="al-brand-sub">Administration</span>
@@ -31,7 +31,15 @@
         </router-link>
         <router-link to="/admin/services" class="al-nav-item" active-class="al-nav-item--active" @click="mobileOpen = false">
           <i class="fas fa-cogs al-nav-icon"></i>
-          <span v-show="!collapsed">Services</span>
+          <span v-show="!collapsed">Productions</span>
+        </router-link>
+        <router-link to="/admin/equipe" class="al-nav-item" active-class="al-nav-item--active" @click="mobileOpen = false">
+          <i class="fas fa-id-badge al-nav-icon"></i>
+          <span v-show="!collapsed">Équipe</span>
+        </router-link>
+        <router-link to="/admin/campagne" class="al-nav-item" active-class="al-nav-item--active" @click="mobileOpen = false">
+          <i class="fas fa-seedling al-nav-icon"></i>
+          <span v-show="!collapsed">Campagne</span>
         </router-link>
         <router-link to="/admin/statistiques" class="al-nav-item" active-class="al-nav-item--active" @click="mobileOpen = false">
           <i class="fas fa-chart-bar al-nav-icon"></i>
@@ -123,7 +131,9 @@ const TITLES = {
   AdminDashboard: 'Tableau de bord',
   AdminBlog: 'Articles',
   AdminGalerie: 'Galerie',
-  AdminServices: 'Services',
+  AdminServices: 'Productions',
+  AdminEquipe: 'Équipe',
+  AdminCampagne: 'Campagnes',
   AdminContacts: 'Messages',
   AdminStatistiques: 'Statistiques',
   AdminUsers: 'Utilisateurs',

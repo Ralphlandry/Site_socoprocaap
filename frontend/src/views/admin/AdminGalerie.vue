@@ -5,23 +5,32 @@
         <h1 class="ap-title">Galerie photo</h1>
         <p class="ap-desc">Gérez vos images et catégories</p>
       </div>
-      <div class="ap-actions">
-        <button class="btn btn-ghost" @click="showCatForm = true">
-          <i class="fas fa-folder-plus"></i> Catégorie
-        </button>
-        <button class="btn btn-primary" @click="openForm()">
-          <i class="fas fa-plus"></i> Nouvelle image
-        </button>
-      </div>
+      <button v-if="activeTab === 'images'" class="btn btn-primary" @click="openForm()">
+        <i class="fas fa-plus"></i> Nouvelle image
+      </button>
+      <button v-else class="btn btn-primary" @click="openCatForm()">
+        <i class="fas fa-plus"></i> Nouvelle catégorie
+      </button>
     </div>
 
-    <!-- Cat modal -->
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab" :class="{ active: activeTab === 'images' }" @click="activeTab = 'images'">
+        <i class="fas fa-images"></i> Images
+      </button>
+      <button class="tab" :class="{ active: activeTab === 'categories' }" @click="activeTab = 'categories'">
+        <i class="fas fa-folder"></i> Catégories
+        <span v-if="categories.length" class="tab-badge">{{ categories.length }}</span>
+      </button>
+    </div>
+
+    <!-- Modal catégorie (create / edit) -->
     <Teleport to="body">
       <transition name="mo">
         <div v-if="showCatForm" class="mo-overlay" @click.self="showCatForm = false">
           <div class="mo-box mo-sm">
             <div class="mo-head">
-              <h2>Nouvelle catégorie</h2>
+              <h2><i class="fas fa-folder"></i> {{ editingCat ? 'Modifier la catégorie' : 'Nouvelle catégorie' }}</h2>
               <button class="mo-close" @click="showCatForm = false"><i class="fas fa-times"></i></button>
             </div>
             <form @submit.prevent="saveCat" class="mo-body">
@@ -29,7 +38,7 @@
               <div class="field"><label>Ordre d'affichage</label><input v-model.number="catForm.ordre" type="number" placeholder="0" /></div>
               <div class="mo-foot">
                 <button type="button" class="btn btn-ghost" @click="showCatForm = false">Annuler</button>
-                <button type="submit" class="btn btn-primary">Enregistrer</button>
+                <button type="submit" class="btn btn-primary">{{ editingCat ? 'Enregistrer' : 'Créer' }}</button>
               </div>
             </form>
           </div>
@@ -37,7 +46,7 @@
       </transition>
     </Teleport>
 
-    <!-- Image modal -->
+    <!-- Modal image (create / edit) -->
     <Teleport to="body">
       <transition name="mo">
         <div v-if="showForm" class="mo-overlay" @click.self="showForm = false">
@@ -87,28 +96,55 @@
       </transition>
     </Teleport>
 
-    <!-- Image grid -->
-    <div v-if="images.length" class="img-grid">
-      <div v-for="img in images" :key="img.id" class="img-card">
-        <div class="img-thumb">
-          <img v-if="img.image" :src="img.image" :alt="img.titre" />
-          <div v-else class="img-ph"><i class="fas fa-image"></i></div>
-          <span class="img-badge" :class="img.publie ? 'badge-ok' : 'badge-muted'">
-            {{ img.publie ? 'Publié' : 'Masqué' }}
-          </span>
-        </div>
-        <div class="img-info">
-          <span class="img-name">{{ img.titre }}</span>
-          <span class="img-cat">{{ img.categorie_nom || 'Sans catégorie' }}</span>
-          <div class="img-acts">
-            <button class="act" @click="openForm(img)" title="Modifier"><i class="fas fa-pen"></i></button>
-            <button class="act act-red" @click="remove(img.id)" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
+    <!-- TAB: Images -->
+    <div v-if="activeTab === 'images'">
+      <div v-if="images.length" class="img-grid">
+        <div v-for="img in images" :key="img.id" class="img-card">
+          <div class="img-thumb">
+            <img v-if="img.image" :src="img.image" :alt="img.titre" />
+            <div v-else class="img-ph"><i class="fas fa-image"></i></div>
+            <span class="img-badge" :class="img.publie ? 'badge-ok' : 'badge-muted'">
+              {{ img.publie ? 'Publié' : 'Masqué' }}
+            </span>
+          </div>
+          <div class="img-info">
+            <span class="img-name">{{ img.titre }}</span>
+            <span class="img-cat">{{ img.categorie_nom || 'Sans catégorie' }}</span>
+            <div class="img-acts">
+              <button class="act" @click="openForm(img)" title="Modifier"><i class="fas fa-pen"></i></button>
+              <button class="act act-red" @click="remove(img.id)" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
+            </div>
           </div>
         </div>
       </div>
+      <div v-else class="empty-state">
+        <i class="fas fa-images"></i><p>Aucune image dans la galerie</p>
+      </div>
     </div>
-    <div v-else class="empty-state">
-      <i class="fas fa-images"></i><p>Aucune image dans la galerie</p>
+
+    <!-- TAB: Catégories -->
+    <div v-if="activeTab === 'categories'">
+      <div v-if="categories.length" class="cat-table">
+        <div class="cat-row cat-header">
+          <span>Nom</span>
+          <span>Ordre</span>
+          <span>Images</span>
+          <span></span>
+        </div>
+        <div class="cat-row" v-for="c in categories" :key="c.id">
+          <span class="cat-name"><i class="fas fa-folder cat-icon"></i> {{ c.nom }}</span>
+          <span class="cat-ordre">{{ c.ordre }}</span>
+          <span class="cat-count">{{ imageCountFor(c.id) }} image{{ imageCountFor(c.id) !== 1 ? 's' : '' }}</span>
+          <div class="cat-acts">
+            <button class="act" title="Modifier" @click="openCatForm(c)"><i class="fas fa-pen"></i></button>
+            <button class="act act-red" title="Supprimer" @click="removeCat(c.id)"><i class="fas fa-trash-alt"></i></button>
+          </div>
+        </div>
+      </div>
+      <div v-else class="empty-state">
+        <i class="fas fa-folder-open"></i>
+        <p>Aucune catégorie. Cliquez sur « Nouvelle catégorie » pour commencer.</p>
+      </div>
     </div>
   </div>
 </template>
@@ -119,9 +155,11 @@ import api from '../../api'
 
 const images = ref([])
 const categories = ref([])
+const activeTab = ref('images')
 const showForm = ref(false)
 const showCatForm = ref(false)
 const editing = ref(null)
+const editingCat = ref(null)
 const saving = ref(false)
 const form = ref({ titre: '', categorie: null, description: '', publie: true, imageFile: null })
 const catForm = ref({ nom: '', ordre: 0 })
@@ -132,12 +170,22 @@ async function load() {
   categories.value = catRes.data.results || catRes.data
 }
 
+function imageCountFor(catId) {
+  return images.value.filter(img => img.categorie === catId).length
+}
+
 function openForm(img = null) {
   editing.value = img?.id || null
   form.value = img
     ? { titre: img.titre, categorie: img.categorie, description: img.description || '', publie: img.publie, imageFile: null }
     : { titre: '', categorie: null, description: '', publie: true, imageFile: null }
   showForm.value = true
+}
+
+function openCatForm(cat = null) {
+  editingCat.value = cat?.id || null
+  catForm.value = cat ? { nom: cat.nom, ordre: cat.ordre || 0 } : { nom: '', ordre: 0 }
+  showCatForm.value = true
 }
 
 async function save() {
@@ -150,7 +198,7 @@ async function save() {
   if (form.value.imageFile) fd.append('image', form.value.imageFile)
   try {
     if (editing.value) {
-      await api.put(`/admin/galerie/${editing.value}/`, fd, { headers: { 'Content-Type': 'multipart/form-data' } })
+      await api.patch(`/admin/galerie/${editing.value}/`, fd, { headers: { 'Content-Type': 'multipart/form-data' } })
     } else {
       await api.post('/admin/galerie/', fd, { headers: { 'Content-Type': 'multipart/form-data' } })
     }
@@ -160,8 +208,11 @@ async function save() {
 }
 
 async function saveCat() {
-  await api.post('/admin/galerie/categories/', catForm.value)
-  catForm.value = { nom: '', ordre: 0 }
+  if (editingCat.value) {
+    await api.patch(`/admin/galerie/categories/${editingCat.value}/`, catForm.value)
+  } else {
+    await api.post('/admin/galerie/categories/', catForm.value)
+  }
   showCatForm.value = false
   await load()
 }
@@ -169,6 +220,16 @@ async function saveCat() {
 async function remove(id) {
   if (!confirm('Supprimer cette image ?')) return
   await api.delete(`/admin/galerie/${id}/`)
+  await load()
+}
+
+async function removeCat(id) {
+  const count = imageCountFor(id)
+  const msg = count > 0
+    ? `Cette catégorie contient ${count} image(s). Les images seront conservées sans catégorie. Confirmer la suppression ?`
+    : 'Supprimer cette catégorie ?'
+  if (!confirm(msg)) return
+  await api.delete(`/admin/galerie/categories/${id}/`)
   await load()
 }
 
@@ -182,13 +243,73 @@ onMounted(load)
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
   flex-wrap: wrap;
   gap: 12px;
 }
 .ap-title { font-size: 1.4rem; font-weight: 700; color: #0f172a; margin-bottom: 2px; letter-spacing: -0.02em; }
 .ap-desc { color: #94a3b8; font-size: 0.82rem; font-weight: 500; }
-.ap-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 4px;
+  background: #f1f5f9;
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 24px;
+  width: fit-content;
+}
+.tab {
+  display: flex; align-items: center; gap: 7px;
+  padding: 8px 18px; border: none; background: transparent;
+  border-radius: 7px; font-size: 0.85rem; font-weight: 600;
+  color: #64748b; cursor: pointer; transition: all 0.15s;
+  position: relative;
+}
+.tab:hover { color: #0f172a; }
+.tab.active { background: #fff; color: #059669; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+.tab-badge {
+  background: #059669; color: #fff;
+  font-size: 0.65rem; font-weight: 700;
+  padding: 1px 6px; border-radius: 10px;
+}
+
+/* Category table */
+.cat-table {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.cat-row {
+  display: grid;
+  grid-template-columns: 1fr 80px 110px 80px;
+  align-items: center;
+  padding: 13px 18px;
+  border-bottom: 1px solid #f1f5f9;
+  gap: 12px;
+}
+.cat-row:last-child { border-bottom: none; }
+.cat-header {
+  background: #f8fafc;
+  font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.05em; color: #94a3b8;
+}
+.cat-name {
+  font-weight: 600; color: #0f172a; font-size: 0.9rem;
+  display: flex; align-items: center; gap: 8px;
+}
+.cat-icon { color: #f59e0b; }
+.cat-ordre { color: #64748b; font-size: 0.85rem; }
+.cat-count {
+  font-size: 0.78rem; font-weight: 600;
+  background: #ecfdf5; color: #065f46;
+  padding: 2px 10px; border-radius: 20px;
+  width: fit-content;
+}
+.cat-acts { display: flex; gap: 6px; justify-content: flex-end; }
 
 .btn {
   display: inline-flex;

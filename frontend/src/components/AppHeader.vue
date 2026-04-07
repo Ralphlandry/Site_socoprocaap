@@ -2,7 +2,7 @@
   <header class="header" :class="{ scrolled: isScrolled }">
     <div class="container header-inner">
       <router-link to="/" class="logo">
-        <img src="/logo.jpeg" alt="SOCOPROCAAP" class="logo-img" />
+        <img src="/LOGO (1).png" alt="SOCOPROCAAP" class="logo-img" />
         <span class="logo-text">SOCOPROCAAP</span>
       </router-link>
 
@@ -12,7 +12,8 @@
 
       <nav class="nav" :class="{ open: menuOpen }">
         <router-link to="/" @click="menuOpen = false">Accueil</router-link>
-        <router-link to="/services" @click="menuOpen = false">Services</router-link>
+        <router-link to="/equipe" @click="menuOpen = false">Équipe</router-link>
+        <router-link to="/productions" @click="menuOpen = false">Productions</router-link>
         <router-link to="/blog" @click="menuOpen = false">Blog</router-link>
         <router-link to="/galerie" @click="menuOpen = false">Galerie</router-link>
         <router-link to="/statistiques" @click="menuOpen = false">Statistiques</router-link>
@@ -73,8 +74,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
 .logo-img {
   width: 42px;
   height: 42px;
-  border-radius: 50%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .nav {
