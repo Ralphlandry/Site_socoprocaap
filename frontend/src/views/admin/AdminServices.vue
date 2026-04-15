@@ -37,6 +37,12 @@
                 </label>
               </div>
               <div class="field"><label>Ordre d'affichage</label><input v-model.number="form.ordre" type="number" /></div>
+              <div class="field checkbox-field">
+                <label class="checkbox-label">
+                  <input type="checkbox" v-model="form.actif" />
+                  <span>Actif (visible sur le site)</span>
+                </label>
+              </div>
               <div class="mo-foot">
                 <button type="button" class="btn btn-ghost" @click="showForm = false">Annuler</button>
                 <button type="submit" class="btn btn-primary" :disabled="saving">
@@ -82,7 +88,7 @@ const services = ref([])
 const showForm = ref(false)
 const editing = ref(null)
 const saving = ref(false)
-const form = ref({ titre: '', icone: '', description: '', ordre: 0, imageFile: null })
+const form = ref({ titre: '', icone: '', description: '', ordre: 0, actif: true, imageFile: null })
 
 async function load() {
   const { data } = await api.get('/admin/services/')
@@ -92,8 +98,8 @@ async function load() {
 function openForm(s = null) {
   editing.value = s?.id || null
   form.value = s
-    ? { titre: s.titre, icone: s.icone || '', description: s.description || '', ordre: s.ordre || 0, imageFile: null }
-    : { titre: '', icone: '', description: '', ordre: 0, imageFile: null }
+    ? { titre: s.titre, icone: s.icone || '', description: s.description || '', ordre: s.ordre || 0, actif: s.actif || true, imageFile: null }
+    : { titre: '', icone: '', description: '', ordre: 0, actif: true, imageFile: null }
   showForm.value = true
 }
 
@@ -104,6 +110,7 @@ async function save() {
   fd.append('description', form.value.description)
   fd.append('icone', form.value.icone)
   fd.append('ordre', form.value.ordre)
+  fd.append('actif', form.value.actif ? 'true' : 'false')
   if (form.value.imageFile) fd.append('image', form.value.imageFile)
   try {
     if (editing.value) {
@@ -163,6 +170,10 @@ onMounted(load)
 .file-pick { display: flex; align-items: center; gap: 8px; padding: 9px 12px; border: 1px dashed #cbd5e1; border-radius: 8px; color: #64748b; font-size: 0.84rem; cursor: pointer; background: #f8fafc; transition: border-color 0.15s; }
 .file-pick:hover { border-color: #059669; color: #059669; }
 .file-pick input { display: none; }
+
+.checkbox-field { margin-bottom: 15px; }
+.checkbox-label { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.9rem; color: #0f172a; font-weight: 500; }
+.checkbox-label input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: #059669; }
 
 .svc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; }
 .svc-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: box-shadow 0.2s, transform 0.2s; }

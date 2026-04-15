@@ -41,6 +41,10 @@
           <i class="fas fa-seedling al-nav-icon"></i>
           <span v-show="!collapsed">Campagne</span>
         </router-link>
+        <router-link to="/admin/partenaires" class="al-nav-item" active-class="al-nav-item--active" @click="mobileOpen = false">
+          <i class="fas fa-link al-nav-icon"></i>
+          <span v-show="!collapsed">Partenaires</span>
+        </router-link>
         <router-link to="/admin/statistiques" class="al-nav-item" active-class="al-nav-item--active" @click="mobileOpen = false">
           <i class="fas fa-chart-bar al-nav-icon"></i>
           <span v-show="!collapsed">Statistiques</span>
@@ -134,6 +138,7 @@ const TITLES = {
   AdminServices: 'Productions',
   AdminEquipe: 'Équipe',
   AdminCampagne: 'Campagnes',
+  AdminPartenaire: 'Partenaires',
   AdminContacts: 'Messages',
   AdminStatistiques: 'Statistiques',
   AdminUsers: 'Utilisateurs',

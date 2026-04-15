@@ -13,6 +13,7 @@ urlpatterns = [
     path('info/', views.InfoSiteView.as_view(), name='info-site'),
     path('statistiques/', views.StatistiqueListView.as_view(), name='statistique-list'),
     path('campagnes/', views.CampagneListView.as_view(), name='campagne-list'),
+    path('partenaires/', views.PartenaireListView.as_view(), name='partenaire-list'),
 
     # Auth
     path('auth/csrf/', views.CSRFView.as_view(), name='csrf'),
@@ -39,6 +40,8 @@ urlpatterns = [
     path('admin/equipe/<int:pk>/', views.AdminEquipeDetailView.as_view(), name='admin-equipe-detail'),
     path('admin/campagnes/', views.AdminCampagneListCreateView.as_view(), name='admin-campagne-list'),
     path('admin/campagnes/<int:pk>/', views.AdminCampagneDetailView.as_view(), name='admin-campagne-detail'),
+    path('admin/partenaires/', views.AdminPartenaireListCreateView.as_view(), name='admin-partenaire-list'),
+    path('admin/partenaires/<int:pk>/', views.AdminPartenaireDetailView.as_view(), name='admin-partenaire-detail'),
     path('admin/users/', views.AdminUserListCreateView.as_view(), name='admin-user-list'),
     path('admin/users/<int:pk>/', views.AdminUserDetailView.as_view(), name='admin-user-detail'),
     path('admin/users/<int:pk>/change-password/', views.AdminUserChangePasswordView.as_view(), name='admin-user-change-password'),

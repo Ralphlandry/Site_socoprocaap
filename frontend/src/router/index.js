@@ -17,6 +17,11 @@ const routes = [
     redirect: '/productions',
   },
   {
+    path: '/commercialisation',
+    name: 'Commercialisation',
+    component: () => import('../views/CommercialisationView.vue'),
+  },
+  {
     path: '/equipe',
     name: 'Equipe',
     component: () => import('../views/EquipeView.vue'),
@@ -63,6 +68,7 @@ const routes = [
       { path: 'services', name: 'AdminServices', component: () => import('../views/admin/AdminServices.vue') },
       { path: 'equipe', name: 'AdminEquipe', component: () => import('../views/admin/AdminEquipe.vue') },
       { path: 'campagne', name: 'AdminCampagne', component: () => import('../views/admin/AdminCampagne.vue') },
+      { path: 'partenaires', name: 'AdminPartenaire', component: () => import('../views/admin/AdminPartenaire.vue') },
       { path: 'contacts', name: 'AdminContacts', component: () => import('../views/admin/AdminContacts.vue') },
       { path: 'statistiques', name: 'AdminStatistiques', component: () => import('../views/admin/AdminStatistiques.vue') },
       { path: 'users', name: 'AdminUsers', component: () => import('../views/admin/AdminUsers.vue') },

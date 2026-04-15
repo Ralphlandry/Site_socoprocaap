@@ -175,3 +175,21 @@ class Campagne(models.Model):
 
     def __str__(self):
         return f"{self.produit} — {self.nom_producteur} ({self.session})"
+
+
+class Partenaire(models.Model):
+    """Partenaires de commercialisation."""
+    nom = models.CharField(max_length=200)
+    image = models.ImageField(upload_to='partenaires/')
+    description = models.TextField()
+    ordre = models.PositiveIntegerField(default=0)
+    actif = models.BooleanField(default=True)
+    date_creation = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['ordre', 'nom']
+        verbose_name = 'Partenaire'
+        verbose_name_plural = 'Partenaires'
+
+    def __str__(self):
+        return self.nom

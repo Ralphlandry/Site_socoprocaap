@@ -14,6 +14,7 @@
         <router-link to="/" @click="menuOpen = false">Accueil</router-link>
         <router-link to="/equipe" @click="menuOpen = false">Équipe</router-link>
         <router-link to="/productions" @click="menuOpen = false">Productions</router-link>
+        <router-link to="/commercialisation" @click="menuOpen = false">Commercialisation</router-link>
         <router-link to="/blog" @click="menuOpen = false">Blog</router-link>
         <router-link to="/galerie" @click="menuOpen = false">Galerie</router-link>
         <router-link to="/statistiques" @click="menuOpen = false">Statistiques</router-link>

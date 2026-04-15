@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Service, BlogPost, GalerieCategorie, GalerieImage, Contact, InfoSite, Statistique, MembreEquipe, Campagne
+from .models import Service, BlogPost, GalerieCategorie, GalerieImage, Contact, InfoSite, Statistique, MembreEquipe, Campagne, Partenaire
 
 
 class CampagneSerializer(serializers.ModelSerializer):
@@ -85,3 +85,16 @@ class InfoSiteSerializer(serializers.ModelSerializer):
     class Meta:
         model = InfoSite
         fields = '__all__'
+
+
+class PartenaireSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Partenaire
+        fields = '__all__'
+
+
+class PartenaireAdminSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Partenaire
+        fields = '__all__'
+        read_only_fields = ['date_creation']

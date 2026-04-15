@@ -6,13 +6,13 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.middleware.csrf import get_token
-from .models import Service, BlogPost, GalerieCategorie, GalerieImage, Contact, InfoSite, Statistique, MembreEquipe, Campagne
+from .models import Service, BlogPost, GalerieCategorie, GalerieImage, Contact, InfoSite, Statistique, MembreEquipe, Campagne, Partenaire
 from .serializers import (
     ServiceSerializer, BlogPostListSerializer, BlogPostDetailSerializer,
     GalerieCategorieSerializer, GalerieImageSerializer,
     ContactSerializer, ContactAdminSerializer, InfoSiteSerializer,
     BlogPostAdminSerializer, GalerieImageAdminSerializer, StatistiqueSerializer,
-    MembreEquipeSerializer, CampagneSerializer,
+    MembreEquipeSerializer, CampagneSerializer, PartenaireSerializer, PartenaireAdminSerializer,
 )
 
 
@@ -78,6 +78,14 @@ class InfoSiteView(generics.GenericAPIView):
 class EquipeListView(generics.ListAPIView):
     queryset = MembreEquipe.objects.filter(actif=True)
     serializer_class = MembreEquipeSerializer
+    permission_classes = [AllowAny]
+    pagination_class = None
+
+
+# Partenaires public
+class PartenaireListView(generics.ListAPIView):
+    queryset = Partenaire.objects.filter(actif=True)
+    serializer_class = PartenaireSerializer
     permission_classes = [AllowAny]
     pagination_class = None
 
@@ -294,6 +302,22 @@ class AdminStatistiqueDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Statistique.objects.all()
     serializer_class = StatistiqueSerializer
     permission_classes = [IsAdminUser]
+
+
+# Partenaires admin
+class AdminPartenaireListCreateView(generics.ListCreateAPIView):
+    queryset = Partenaire.objects.all()
+    serializer_class = PartenaireAdminSerializer
+    permission_classes = [IsAdminUser]
+    parser_classes = [MultiPartParser, FormParser]
+    pagination_class = None
+
+
+class AdminPartenaireDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Partenaire.objects.all()
+    serializer_class = PartenaireAdminSerializer
+    permission_classes = [IsAdminUser]
+    parser_classes = [MultiPartParser, FormParser]
 
 
 # InfoSite admin
