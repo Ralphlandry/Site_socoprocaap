@@ -1,3 +1,17 @@
+<script setup>
+import { ref, onMounted, onUnmounted } from 'vue'
+
+const isScrolled = ref(false)
+const menuOpen = ref(false)
+
+function onScroll() {
+  isScrolled.value = window.scrollY > 50
+}
+
+onMounted(() => window.addEventListener('scroll', onScroll))
+onUnmounted(() => window.removeEventListener('scroll', onScroll))
+</script>
+
 <template>
   <header class="header" :class="{ scrolled: isScrolled }">
     <div class="container header-inner">
@@ -24,20 +38,6 @@
   </header>
 </template>
 
-<script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
-
-const isScrolled = ref(false)
-const menuOpen = ref(false)
-
-function onScroll() {
-  isScrolled.value = window.scrollY > 50
-}
-
-onMounted(() => window.addEventListener('scroll', onScroll))
-onUnmounted(() => window.removeEventListener('scroll', onScroll))
-</script>
-
 <style scoped>
 .header {
   position: fixed;
@@ -48,6 +48,12 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
   background: transparent;
   transition: all 0.3s ease;
   padding: 15px 0;
+}
+
+.header.scrolled {
+  background: var(--color-primary-dark);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  padding: 10px 0;
 }
 
 .header.scrolled {

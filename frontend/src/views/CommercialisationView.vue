@@ -29,6 +29,17 @@
       </div>
     </section>
 
+    <!-- IMMATRICULATION -->
+    <section class="section immatriculation-section">
+      <div class="container">
+        <div class="immatriculation-content reveal reveal-up">
+          <div class="immatriculation-image">
+            <img src="/immatriculation.jpeg" alt="Immatriculation SOCOPROCAAP" class="immatriculation-img" />
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- CARACTÉRISTIQUES -->
     <section class="section features-section">
       <div class="container">
@@ -66,20 +77,29 @@
         <p class="partenaires-intro reveal reveal-up">
           Dans le cadre de nos activités de commercialisation des fèves de cacao, nous collaborons avec un vaste réseau de partenaires engagés dans la valorisation des fèves de cacao. Nous assurons une chaîne d'approvisionnement efficace, garantissant la qualité, la traçabilité et la compétitivité de nos produits sur le marché national et international.
         </p>
-        <div class="partenaires-list" v-if="partenaires.length">
-          <div class="partenaire-item reveal reveal-up" v-for="(partenaire, i) in partenaires" :key="partenaire.id" :style="'--delay:' + (i * 100) + 'ms'">
-            <div class="partenaire-logo">
-              <img v-if="partenaire.image" :src="partenaire.image" :alt="partenaire.nom" class="partenaire-img" />
+        
+        <div v-if="partenaires.length" class="partenaires-list">
+          <div
+            class="partenaire-item"
+            v-for="(partenaire, index) in partenaires"
+            :key="partenaire.id"
+            :class="{ reverse: index % 2 !== 0 }"
+          >
+            <div class="partenaire-visual">
+              <img v-if="partenaire.image" :src="partenaire.image" :alt="partenaire.nom" />
               <div v-else class="partenaire-placeholder"><i class="fas fa-building"></i></div>
             </div>
             <div class="partenaire-info">
-              <h3>{{ partenaire.nom }}</h3>
+              <div class="partenaire-number">{{ String(index + 1).padStart(2, '0') }}</div>
+              <h2>{{ partenaire.nom }}</h2>
               <p>{{ partenaire.description }}</p>
             </div>
           </div>
         </div>
-        <div v-else class="no-partenaires">
-          <p>Nos partenaires seront bientôt disponibles</p>
+
+        <div v-else class="empty-state">
+          <i class="fas fa-building"></i>
+          <p>Nos partenaires seront bientôt disponibles.</p>
         </div>
       </div>
     </section>
@@ -87,7 +107,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import api from '../api'
 
 const partenaires = ref([])
@@ -112,13 +132,15 @@ function initScrollAnimations() {
 }
 
 onMounted(async () => {
-  setTimeout(initScrollAnimations, 200)
-
   try {
     const res = await api.get('/partenaires/')
     partenaires.value = res.data
+    await nextTick()
+    setTimeout(initScrollAnimations, 300)
   } catch {
     // API might not be available yet
+    await nextTick()
+    setTimeout(initScrollAnimations, 300)
   }
 })
 
@@ -134,7 +156,7 @@ onUnmounted(() => {
   padding: 120px 0 60px;
   text-align: center;
   position: relative;
-  margin-top: 60px;
+  margin-top: 0;
 }
 
 .page-header::before {
@@ -219,6 +241,36 @@ onUnmounted(() => {
   width: 100%;
   height: 300px;
   object-fit: cover;
+  display: block;
+}
+
+.immatriculation-section {
+  background: var(--color-white);
+  padding: 60px 20px;
+}
+
+.immatriculation-content {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.immatriculation-image {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  transition: transform 0.3s ease;
+}
+
+.immatriculation-image:hover {
+  transform: translateY(-8px);
+}
+
+.immatriculation-img {
+  width: 100%;
+  height: auto;
+  max-height: 500px;
+  object-fit: contain;
   display: block;
 }
 
@@ -357,6 +409,27 @@ onUnmounted(() => {
   }
 }
 
+/* Immatriculation responsive */
+@media (max-width: 768px) {
+  .immatriculation-section {
+    padding: 40px 20px;
+  }
+
+  .immatriculation-img {
+    max-height: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .immatriculation-section {
+    padding: 30px 15px;
+  }
+
+  .immatriculation-img {
+    max-height: 250px;
+  }
+}
+
 /* PARTENAIRES SECTION */
 .partenaires-section {
   background: var(--color-white);
@@ -370,114 +443,121 @@ onUnmounted(() => {
   color: var(--color-text-light);
   line-height: 1.8;
   text-align: justify;
-  opacity: 0;
 }
 
 .partenaires-list {
   display: flex;
   flex-direction: column;
-  gap: 30px;
+  gap: 60px;
   max-width: 1000px;
   margin: 0 auto;
 }
 
 .partenaire-item {
   display: grid;
-  grid-template-columns: 220px 1fr;
-  gap: 30px;
-  align-items: flex-start;
-  background: var(--color-white);
-  border: 1px solid rgba(200, 137, 26, 0.15);
-  border-radius: 14px;
-  padding: 25px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  transition: all 0.3s ease;
-  opacity: 0;
-}
-
-.partenaire-item:hover {
-  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-  border-color: var(--color-secondary);
-  transform: translateY(-4px);
-}
-
-.partenaire-logo {
-  width: 220px;
-  height: 140px;
-  background: #f0f4f8;
-  border-radius: 10px;
-  overflow: hidden;
-  display: flex;
+  grid-template-columns: 1fr 1fr;
+  gap: 50px;
   align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
 }
 
-.partenaire-img {
+.partenaire-item.reverse {
+  direction: rtl;
+}
+
+.partenaire-item.reverse > * {
+  direction: ltr;
+}
+
+.partenaire-visual img {
   width: 100%;
-  height: 100%;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  height: 350px;
   object-fit: cover;
-  transition: transform 0.3s ease;
 }
 
-.partenaire-item:hover .partenaire-img {
-  transform: scale(1.05);
+.partenaire-visual {
+  overflow: hidden;
 }
 
 .partenaire-placeholder {
   width: 100%;
-  height: 100%;
+  height: 350px;
+  background: #f0f4f8;
+  border-radius: var(--radius);
   display: flex;
   align-items: center;
   justify-content: center;
   color: #cbd5e1;
-  font-size: 2.5rem;
+  font-size: 3rem;
+  box-shadow: var(--shadow);
 }
 
-.partenaire-info {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-}
-
-.partenaire-info h3 {
+.partenaire-number {
   font-family: var(--font-heading);
-  font-size: 1.4rem;
+  font-size: 3rem;
+  color: var(--color-secondary);
+  opacity: 0.5;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.partenaire-info h2 {
+  font-family: var(--font-heading);
+  font-size: 1.8rem;
   color: var(--color-primary-dark);
   margin-bottom: 15px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
 }
 
 .partenaire-info p {
   color: var(--color-text-light);
-  font-size: 0.95rem;
-  line-height: 1.7;
-  text-align: justify;
-  margin: 0;
+  line-height: 1.8;
+  font-size: 1rem;
 }
 
-.no-partenaires {
+.empty-state {
   text-align: center;
-  padding: 60px 20px;
+  padding: 60px 0;
   color: var(--color-text-light);
-  font-size: 1.1rem;
+}
+
+.empty-state i {
+  font-size: 3rem;
+  margin-bottom: 15px;
+  color: var(--color-primary-light);
 }
 
 @media (max-width: 900px) {
-  .partenaire-item {
-    grid-template-columns: 150px 1fr;
-    gap: 20px;
-    padding: 20px;
+  .partenaire-item,
+  .partenaire-item.reverse {
+    grid-template-columns: 1fr;
+    direction: ltr;
   }
 
-  .partenaire-logo {
-    width: 150px;
-    height: 120px;
+  .partenaire-visual img {
+    height: 280px;
   }
 
-  .partenaire-info h3 {
-    font-size: 1.2rem;
+  .partenaire-number {
+    font-size: 2.5rem;
+  }
+
+  .partenaire-info h2 {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .partenaire-visual img {
+    height: 220px;
+  }
+
+  .partenaire-number {
+    font-size: 2rem;
+  }
+
+  .partenaire-info h2 {
+    font-size: 1.3rem;
   }
 
   .partenaire-info p {
@@ -487,46 +567,52 @@ onUnmounted(() => {
 
 @media (max-width: 768px) {
   .partenaires-list {
-    gap: 20px;
+    gap: 40px;
   }
 
-  .partenaire-item {
+  .partenaire-item,
+  .partenaire-item.reverse {
     grid-template-columns: 1fr;
-    gap: 15px;
-    padding: 18px;
+    direction: ltr;
+    gap: 30px;
   }
 
-  .partenaire-logo {
-    width: 100%;
-    height: 200px;
+  .partenaire-visual img {
+    height: 250px;
   }
 
-  .partenaire-info h3 {
-    font-size: 1.1rem;
+  .partenaire-number {
+    font-size: 2.2rem;
   }
 
-  .partenaire-info p {
-    font-size: 0.9rem;
+  .partenaire-info h2 {
+    font-size: 1.4rem;
   }
 
   .partenaires-intro {
-    font-size: 0.95rem;
+    text-align: left;
   }
 }
 
 @media (max-width: 480px) {
-  .partenaire-item {
-    padding: 15px;
-    gap: 12px;
+  .section-title {
+    font-size: 1.8rem;
   }
 
-  .partenaire-logo {
-    height: 160px;
+  .partenaires-list {
+    gap: 30px;
   }
 
-  .partenaire-info h3 {
-    font-size: 1rem;
-    margin-bottom: 10px;
+  .partenaire-visual img {
+    height: 200px;
+  }
+
+  .partenaire-number {
+    font-size: 1.8rem;
+  }
+
+  .partenaire-info h2 {
+    font-size: 1.2rem;
   }
 
   .partenaire-info p {
